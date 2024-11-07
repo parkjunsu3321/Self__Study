@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스트리밍</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
+  <style>
+    body {
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .video-container {
+      width: 80%;
+      max-width: 800px;
+      background-color: #000;
+      border: 1px solid #333;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <video id="video" controls></video>
+  </div>
+
+  <script>
+    const videoElement = document.getElementById('video');
+    const streamUrl = 'http://localhost:8000/live/test-key/index.m3u8';  // HLS 스트림 URL (스트림 키에 맞게 수정)
+
+    // HLS.js를 이용한 HLS 스트리밍 처리
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      
+      // 스트림 URL 로드
+      hls.loadSource(streamUrl);
+      
+      // 비디오에 스트림을 연결
+      hls.attachMedia(videoElement);
+      
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        videoElement.play();
+      });
+      
+      hls.on(Hls.Events.ERROR, function(event, data) {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              console.error('네트워크 오류 발생');
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              console.error('미디어 오류 발생');
+              break;
+            case Hls.ErrorTypes.OTHER_ERROR:
+              console.error('기타 오류 발생');
+              break;
+            default:
+              console.error('알 수 없는 오류 발생');
+              break;
+          }
+        }
+      });
+    }
+    // HLS.js가 지원되지 않으면 기본 비디오 태그에서 직접 재생
+    else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+      videoElement.src = streamUrl;
+      videoElement.addEventListener('loadedmetadata', () => {
+        videoElement.play();
+      });
+    }
+  </script>
+</body>
+</html>
