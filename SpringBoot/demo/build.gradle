@@ -18,19 +18,34 @@ repositories {
 }
 
 dependencies {
-	// Spring Boot와 관련된 의존성
+	// Spring Boot 관련 의존성
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-mustache'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
-	// PostgreSQL 의존성
+	// ✅ Validation (입력값 검증)
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// ✅ Lombok (자동 코드 생성)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
+	// ✅ PostgreSQL (DB)
 	runtimeOnly 'org.postgresql:postgresql'
 
-	// 테스트 관련 의존성
+	// ✅ 테스트 관련 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+configurations{
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
